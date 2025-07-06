@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Any Unit Converter - Convert From Any Unit Instantly</title>
+    <meta name="description" content="Convert from any unit to all others instantly. Just type in any field. Weight, length, temperature conversions with zero configuration.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+    <meta property="og:title" content="Any Unit Converter - Convert From Any Unit Instantly">
+    <meta property="og:description" content="Convert from any unit to all others instantly. Just type in any field. Weight, length, temperature conversions with zero configuration.">
+    <meta property="og:url" content="https://anyunitconverter.eu">
+    <meta property="og:type" content="website">
+    
+    <!-- Plausible Analytics - Privacy-friendly analytics -->
+    <script defer data-domain="anyunitconverter.eu" src="https://plausible.io/js/script.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--gray-700);
+            font-size: 1.125rem;
+        }
+
+        .cookie-notice {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--gray-900);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.875rem;
+            z-index: 1000;
+        }
+
+        .cookie-notice button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.25rem 1rem;
+            border-radius: 4px;
+            margin-left: 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .cookie-notice button:hover {
+            background: var(--primary-dark);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--gray-700);
+        }
+
+        .tab:hover {
+            background: var(--gray-100);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .conversions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .unit-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .unit-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .unit-card.active {
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .unit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .unit-name {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .unit-symbol {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            background: var(--gray-100);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .unit-input-wrapper {
+            position: relative;
+        }
+
+        .unit-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1.25rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .unit-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .unit-input:hover {
+            border-color: var(--gray-300);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .unit-card:hover .copy-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .conversions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Remove number input spinners */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Any Unit Converter</h1>
+            <p class="subtitle">Start typing in any field • See all conversions instantly</p>
+        </header>
+
+        <div class="category-tabs">
+            <button class="tab active" data-category="weight">Weight</button>
+            <button class="tab" data-category="length">Length</button>
+            <button class="tab" data-category="temperature">Temperature</button>
+        </div>
+
+        <div class="conversions-grid" id="conversionsGrid">
+            <!-- Unit cards will be dynamically generated -->
+        </div>
+    </div>
+
+    <div class="cookie-notice" id="cookieNotice">
+        We use privacy-friendly analytics • No personal data collected • <button onclick="document.getElementById('cookieNotice').style.display='none'">OK</button>
+    </div>
+
+    <script>
+        // Conversion data
+        const conversions = {
+            weight: {
+                units: [
+                    { id: 'kg', name: 'Kilograms', symbol: 'kg', factor: 1 },
+                    { id: 'lbs', name: 'Pounds', symbol: 'lbs', factor: 2.20462 },
+                    { id: 'g', name: 'Grams', symbol: 'g', factor: 1000 },
+                    { id: 'oz', name: 'Ounces', symbol: 'oz', factor: 35.274 },
+                    { id: 'st', name: 'Stones', symbol: 'st', factor: 0.157473 },
+                    { id: 't', name: 'Metric Tons', symbol: 't', factor: 0.001 },
+                    { id: 'mg', name: 'Milligrams', symbol: 'mg', factor: 1000000 },
+                    { id: 'µg', name: 'Micrograms', symbol: 'µg', factor: 1000000000 }
+                ]
+            },
+            length: {
+                units: [
+                    { id: 'm', name: 'Meters', symbol: 'm', factor: 1 },
+                    { id: 'ft', name: 'Feet', symbol: 'ft', factor: 3.28084 },
+                    { id: 'in', name: 'Inches', symbol: 'in', factor: 39.3701 },
+                    { id: 'cm', name: 'Centimeters', symbol: 'cm', factor: 100 },
+                    { id: 'mm', name: 'Millimeters', symbol: 'mm', factor: 1000 },
+                    { id: 'km', name: 'Kilometers', symbol: 'km', factor: 0.001 },
+                    { id: 'mi', name: 'Miles', symbol: 'mi', factor: 0.000621371 },
+                    { id: 'yd', name: 'Yards', symbol: 'yd', factor: 1.09361 },
+                    { id: 'nm', name: 'Nautical Miles', symbol: 'nm', factor: 0.000539957 }
+                ]
+            },
+            temperature: {
+                units: [
+                    { 
+                        id: 'c', 
+                        name: 'Celsius', 
+                        symbol: '°C',
+                        toBase: (val) => val,
+                        fromBase: (val) => val
+                    },
+                    { 
+                        id: 'f', 
+                        name: 'Fahrenheit', 
+                        symbol: '°F',
+                        toBase: (val) => (val - 32) * 5/9,
+                        fromBase: (val) => (val * 9/5) + 32
+                    },
+                    { 
+                        id: 'k', 
+                        name: 'Kelvin', 
+                        symbol: 'K',
+                        toBase: (val) => val - 273.15,
+                        fromBase: (val) => val + 273.15
+                    },
+                    { 
+                        id: 'r', 
+                        name: 'Rankine', 
+                        symbol: '°R',
+                        toBase: (val) => (val - 491.67) * 5/9,
+                        fromBase: (val) => (val * 9/5) + 491.67
+                    }
+                ]
+            }
+        };
+
+        // State
+        let currentCategory = 'weight';
+        let activeInput = null;
+
+        // DOM elements
+        const conversionsGrid = document.getElementById('conversionsGrid');
+        const tabs = document.querySelectorAll('.tab');
+
+        // Format number for display
+        function formatNumber(num) {
+            if (num === 0) return '0';
+            if (Math.abs(num) < 0.000001) return num.toExponential(2);
+            if (Math.abs(num) > 999999999) return num.toExponential(2);
+            
+            // Round to 6 significant digits
+            const rounded = parseFloat(num.toPrecision(6));
+            return rounded.toString();
+        }
+
+        // Convert between units
+        function convertValue(value, fromUnit, toUnit, category) {
+            if (!value || isNaN(value)) return '';
+            
+            const units = conversions[category].units;
+            
+            // Temperature conversion
+            if (fromUnit.toBase && fromUnit.fromBase) {
+                const baseValue = fromUnit.toBase(parseFloat(value));
+                return toUnit.fromBase(baseValue);
+            }
+            
+            // Linear conversion
+            const baseValue = parseFloat(value) / fromUnit.factor;
+            return baseValue * toUnit.factor;
+        }
+
+        // Update all fields when one changes
+        function updateAllFields(sourceId, value) {
+            const units = conversions[currentCategory].units;
+            const sourceUnit = units.find(u => u.id === sourceId);
+            
+            if (!sourceUnit) return;
+            
+            units.forEach(unit => {
+                if (unit.id === sourceId) return;
+                
+                const input = document.getElementById(`input-${unit.id}`);
+                if (!input) return;
+                
+                if (value === '' || isNaN(value)) {
+                    input.value = '';
+                } else {
+                    const converted = convertValue(value, sourceUnit, unit, currentCategory);
+                    input.value = formatNumber(converted);
+                }
+            });
+        }
+
+        // Initialize unit cards
+        function initializeUnits() {
+            conversionsGrid.innerHTML = '';
+            const units = conversions[currentCategory].units;
+            
+            units.forEach(unit => {
+                const card = document.createElement('div');
+                card.className = 'unit-card';
+                card.innerHTML = `
+                    <div class="unit-header">
+                        <div class="unit-name">${unit.name}</div>
+                        <div class="unit-symbol">${unit.symbol}</div>
+                    </div>
+                    <div class="unit-input-wrapper">
+                        <input 
+                            type="number" 
+                            class="unit-input" 
+                            id="input-${unit.id}"
+                            data-unit="${unit.id}"
+                            placeholder="0"
+                            step="any"
+                        >
+                        <button class="copy-btn" data-unit="${unit.id}">Copy</button>
+                    </div>
+                `;
+                conversionsGrid.appendChild(card);
+            });
+            
+            // Add event listeners to all inputs
+            document.querySelectorAll('.unit-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const unitId = e.target.dataset.unit;
+                    const value = e.target.value;
+                    
+                    // Update active state
+                    document.querySelectorAll('.unit-card').forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    e.target.closest('.unit-card').classList.add('active');
+                    
+                    activeInput = unitId;
+                    updateAllFields(unitId, value);
+                    updateURL();
+                });
+                
+                input.addEventListener('focus', (e) => {
+                    document.querySelectorAll('.unit-card').forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    e.target.closest('.unit-card').classList.add('active');
+                });
+            });
+        }
+
+        // Copy to clipboard
+        async function copyToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        }
+
+        // Event listeners
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                currentCategory = tab.dataset.category;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                initializeUnits();
+                updateURL();
+            });
+        });
+
+        conversionsGrid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('copy-btn')) {
+                const unitId = e.target.dataset.unit;
+                const input = document.getElementById(`input-${unitId}`);
+                const value = input.value;
+                
+                if (value) {
+                    const unit = conversions[currentCategory].units.find(u => u.id === unitId);
+                    copyToClipboard(`${value} ${unit.symbol}`, e.target);
+                }
+            }
+        });
+
+        // URL state management
+        function updateURL() {
+            const params = new URLSearchParams({
+                cat: currentCategory
+            });
+            
+            if (activeInput) {
+                const input = document.getElementById(`input-${activeInput}`);
+                if (input && input.value) {
+                    params.set('unit', activeInput);
+                    params.set('val', input.value);
+                }
+            }
+            
+            const newURL = window.location.pathname + '?' + params.toString();
+            window.history.replaceState({}, '', newURL);
+        }
+
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const cat = params.get('cat');
+            const unit = params.get('unit');
+            const val = params.get('val');
+            
+            if (cat && conversions[cat]) {
+                currentCategory = cat;
+                tabs.forEach(tab => {
+                    if (tab.dataset.category === cat) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+            }
+            
+            initializeUnits();
+            
+            if (unit && val) {
+                const input = document.getElementById(`input-${unit}`);
+                if (input) {
+                    input.value = val;
+                    input.dispatchEvent(new Event('input'));
+                }
+            }
+        }
+
+        // Initialize
+        loadFromURL();
+    </script>
+</body>
+</html>
